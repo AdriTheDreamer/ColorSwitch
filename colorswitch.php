@@ -18,9 +18,6 @@ class ColorSwitch {
         $hue = $input[0]/60;
         $X = $C*(1-abs((fmod($hue,2))-1));
 
-        echo 'HSL_C' . print_r($C*255, TRUE) . '\n';
-        echo 'HSL_X' . print_r($X*255, TRUE) . '\n';
-
         switch(true)
         {
             case ($hue<=1):
@@ -71,9 +68,6 @@ class ColorSwitch {
         $C = $input[2]/100*$input[1]/100;
         $hue = $input[0]/60;
         $X = $C*(1-abs((fmod($hue,2))-1));
-
-        echo 'HSV_C' . print_r($C*255, TRUE) . '\n';
-        echo 'HSV_X' . print_r($X*255, TRUE) . '\n';
 
         switch(true)
         {
