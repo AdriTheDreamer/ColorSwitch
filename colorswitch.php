@@ -74,26 +74,22 @@ class ColorSwitch
 
     public function outputHSV()
     {
-        $red = $this->sourceRGB[0];
-        $green = $this->sourceRGB[1];
-        $blue = $this->sourceRGB[2];
-
-        $max = max($red, $green, $blue);
-        $min = min($red, $green, $blue);
+        $max = max($this->sourceRGB);
+        $min = min($this->sourceRGB);
         $chroma = $max - $min;
 
         switch ($max) {
             case 0:
                 $hue = 0;
                 break;
-            case $red:
-                $hue = ($green - $blue) / $chroma;
+            case $this->sourceRGB[0]:
+                $hue = ($this->sourceRGB[1] - $this->sourceRGB[2]) / $chroma;
                 break;
-            case $green:
-                $hue = ($blue - $red) / $chroma + 2;
+            case $this->sourceRGB[1]:
+                $hue = ($this->sourceRGB[2] - $this->sourceRGB[0]) / $chroma + 2;
                 break;
-            case $blue:
-                $hue = ($red - $green) / $chroma + 4;
+            case $this->sourceRGB[2]:
+                $hue = ($this->sourceRGB[0] - $this->sourceRGB[1]) / $chroma + 4;
                 break;
             default:
                 $hue = 0;
@@ -101,32 +97,27 @@ class ColorSwitch
 
         $hue = fmod(($hue * 60 + 360) , 360);  // ensures it is positive
         $saturation = ($max == 0) ? 0 : ($chroma / $max * 100);
-        $variance = $max * 100;
-        $this->result = array($hue, $saturation, $variance);
+        $this->result = array($hue, $saturation, $max * 100);
     }
 
     public function outputHSL()
     {
-        $red = $this->sourceRGB[0];
-        $green = $this->sourceRGB[1];
-        $blue = $this->sourceRGB[2];
-
-        $max = max($red, $green, $blue);
-        $min = min($red, $green, $blue);
+        $max = max($this->sourceRGB);
+        $min = min($this->sourceRGB);
         $chroma = $max - $min;
 
         switch ($max) {
             case 0:
                 $hue = 0;
                 break;
-            case $red:
-                $hue = ($green - $blue) / $chroma;
+            case $this->sourceRGB[0]:
+                $hue = ($this->sourceRGB[1] - $this->sourceRGB[2]) / $chroma;
                 break;
-            case $green:
-                $hue = ($blue - $red) / $chroma + 2;
+            case $this->sourceRGB[1]:
+                $hue = ($this->sourceRGB[2] - $this->sourceRGB[0]) / $chroma + 2;
                 break;
-            case $blue:
-                $hue = ($red - $green) / $chroma + 4;
+            case $this->sourceRGB[2]:
+                $hue = ($this->sourceRGB[0] - $this->sourceRGB[1]) / $chroma + 4;
                 break;
             default:
                 $hue = 0;
@@ -140,16 +131,12 @@ class ColorSwitch
 
     public function outputCMYK()
     {
-        $red = $this->sourceRGB[0];
-        $green = $this->sourceRGB[1];
-        $blue = $this->sourceRGB[2];
-
-        $max = max($red, $green, $blue);
+        $max = max($this->sourceRGB);
         $K = 1 - $max;
         if ($K < 1) {
-            $C = (1 - $red - $K) / (1 - $K);
-            $M = (1 - $green - $K) / (1 - $K);
-            $Y = (1 - $blue - $K) / (1 - $K);
+            $C = (1 - $this->sourceRGB[0] - $K) / (1 - $K);
+            $M = (1 - $this->sourceRGB[1] - $K) / (1 - $K);
+            $Y = (1 - $this->sourceRGB[2] - $K) / (1 - $K);
         } else {
             $C = $M = $Y = 0;
         }

@@ -6,7 +6,7 @@ It can be used to convert colors from and to RGB, HSV, HSL and CMYK.
 ## Tutorial
 
 ### Values
-Not necessarily be integers. All real numbers are accepted ^((though there should have no negative values)).
+Not necessarily be integers. All real numbers are accepted (though there should have no negative values).
 
 #### RGB
 RGB values are decimal values (0<=X<=255).
