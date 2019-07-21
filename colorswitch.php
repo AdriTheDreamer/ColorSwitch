@@ -32,7 +32,13 @@ class ColorSwitch
         }
 
         $m = ($input[2] / 100) - ($C / 2);
-        $this->sourceRGB = array_map( function($val) { return $val + m; }, $this->sourceRGB);
+        $this->sourceRGB = array_map( 
+            function ($val) use ($m)
+            { 
+                return $val + $m; 
+            },
+            $this->sourceRGB
+        );
     }
 
     public function inputHSV($input)
@@ -56,20 +62,30 @@ class ColorSwitch
         }
 
         $m = $input[2] / 100 - $C;
-        $this->sourceRGB = array_map( function($val) { return $val + m; }, $this->sourceRGB);
+        $this->sourceRGB = array_map( 
+            function ($val) use ($m)
+            { 
+                return $val + $m; 
+            },
+            $this->sourceRGB
+        );
     }
 
     public function inputCMYK($input)
     {
-        $K = $input[3] * 100;
+        $K = $input[3] / 100;
 
         // make CMYK into CMY of actual value (from percents)
         $CMY = $input;
-        \unset($CMY[3]); // remove the excess K from CMYK
-        $CMY = array_map( function($val) { return $val / 100; }, $CMY);
+        unset($CMY[3]); // remove the excess K from CMYK
 
-        $this->sourceRGB = $CMY;
-        $this->sourceRGB = array_map( function($val) { return (1 - $val) * (1 - $K); }, $this->sourceRGB);
+        $this->sourceRGB = array_map( 
+            function($val) use ($K)
+            { 
+                return (1 - $val / 100) * (1 - $K);
+            }, 
+            $CMY
+        );
     }
 
     public function outputHSV()
