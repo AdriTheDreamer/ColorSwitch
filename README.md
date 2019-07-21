@@ -16,7 +16,7 @@ example: maroon as `128,0,0`
 Both with hue between 0 to 360 as degrees. Saturation, variance or lightness values are percents.
 example: maroon as `(HSV)0,100,25` `(HSL)0,100,50`
 
-### CMYK
+#### CMYK
 CMYK values are all percents.
 ecample: maroon as `0,100,100,50`
 
