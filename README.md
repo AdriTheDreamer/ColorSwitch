@@ -6,14 +6,14 @@ It can be used to convert colors from and to RGB, HSV, HSL and CMYK.
 ## Tutorial
 
 ### Values
-Not necessarily be integers. All real numbers are accepted (though there should have no negative values).
+Not necessarily be integers. All real numbers are accepted ^((though there should have no negative values)).
 
 #### RGB
-RGB values are input as 0<=X<=255.
+RGB values are decimal values (0<=X<=255).
 example: maroon as `128,0,0`
 
 #### HSV, HSL
-Both with hue between 0 to 360 as degrees. Saturation, Value or Lightness values are percents.
+Both with hue between 0 to 360 as degrees. Saturation, variance or lightness values are percents.
 example: maroon as `(HSV)0,100,25` `(HSL)0,100,50`
 
 ### CMYK

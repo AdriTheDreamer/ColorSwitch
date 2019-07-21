@@ -2,16 +2,13 @@
 
 class ColorSwitch
 {
+    // RGB color space in 0<=X<=1
+    var $sourceRGB;
     var $result;
-    var $red; 
-    var $green;
-    var $blue;
 
     public function inputRGB($input)
     {
-        $this->red = $input[0] / 255;
-        $this->green = $input[1] / 255;
-        $this->blue = $input[2] / 255;
+        $this->sourceRGB = array_map( function($val) { return $val / 255; }, $input);
     }
 
     public function inputHSL($input)
@@ -21,35 +18,21 @@ class ColorSwitch
         $X = $C * (1 - abs(fmod($hue, 2) - 1));
 
         if ($hue <= 1) {
-            $this->red = $C;
-            $this->green = $X;
-            $this->blue = 0;
+            $this->sourceRGB = array($C, $X, 0);
         } elseif ($hue <= 2) {
-            $this->red = $X;
-            $this->green = $C;
-            $this->blue = 0;
+            $this->sourceRGB = array($X, $C, 0);
         } elseif ($hue <= 3) {
-            $this->red = 0;
-            $this->green = $C;
-            $this->blue = $X;
+            $this->sourceRGB = array(0, $C, $X);
         } elseif ($hue <= 4) {
-            $this->red = 0;
-            $this->green = $X;
-            $this->blue = $C;
+            $this->sourceRGB = array(0, $X, $C);
         } elseif ($hue <= 5) {
-            $this->red = $X;
-            $this->green = 0;
-            $this->blue = $C;
+            $this->sourceRGB = array($X, 0, $C);
         } elseif ($hue <= 6) {
-            $this->red = $C;
-            $this->green = 0;
-            $this->blue = $X;
+            $this->sourceRGB = array($C, 0, $X);
         }
 
         $m = ($input[2] / 100) - ($C / 2);
-        $this->red = $this->red + $m;
-        $this->green = $this->green + $m;
-        $this->blue = $this->blue + $m;
+        $this->sourceRGB = array_map( function($val) { return $val + m; }, $this->sourceRGB);
     }
 
     public function inputHSV($input)
@@ -59,49 +42,41 @@ class ColorSwitch
         $X = $C * (1 - abs(fmod($hue, 2) - 1));
 
         if ($hue <= 1) {
-            $this->red = $C;
-            $this->green = $X;
-            $this->blue = 0;
+            $this->sourceRGB = array($C, $X, 0);
         } elseif ($hue <= 2) {
-            $this->red = $X;
-            $this->green = $C;
-            $this->blue = 0;
+            $this->sourceRGB = array($X, $C, 0);
         } elseif ($hue <= 3) {
-            $this->red = 0;
-            $this->green = $C;
-            $this->blue = $X;
+            $this->sourceRGB = array(0, $C, $X);
         } elseif ($hue <= 4) {
-            $this->red = 0;
-            $this->green = $X;
-            $this->blue = $C;
+            $this->sourceRGB = array(0, $X, $C);
         } elseif ($hue <= 5) {
-            $this->red = $X;
-            $this->green = 0;
-            $this->blue = $C;
+            $this->sourceRGB = array($X, 0, $C);
         } elseif ($hue <= 6) {
-            $this->red = $C;
-            $this->green = 0;
-            $this->blue = $X;
+            $this->sourceRGB = array($C, 0, $X);
         }
 
         $m = $input[2] / 100 - $C;
-        $this->red = $this->red + $m;
-        $this->green = $this->green + $m;
-        $this->blue = $this->blue + $m;
+        $this->sourceRGB = array_map( function($val) { return $val + m; }, $this->sourceRGB);
     }
 
     public function inputCMYK($input)
     {
-        $this->red = (100 - $input[0]) * (100 - $input[3]) / 10000;
-        $this->green = (100 - $input[1]) * (100 - $input[3]) / 10000;
-        $this->blue = (100 - $input[2]) * (100 - $input[3]) / 10000;
+        $K = $input[3] * 100;
+
+        // make CMYK into CMY of actual value (from percents)
+        $CMY = $input;
+        \unset($CMY[3]); // remove the excess K from CMYK
+        $CMY = array_map( function($val) { return $val / 100; }, $CMY);
+
+        $this->sourceRGB = $CMY;
+        $this->sourceRGB = array_map( function($val) { return (1 - $val) * (1 - $K); }, $this->sourceRGB);
     }
 
     public function outputHSV()
     {
-        $red = $this->red;
-        $green = $this->green;
-        $blue = $this->blue;
+        $red = $this->sourceRGB[0];
+        $green = $this->sourceRGB[1];
+        $blue = $this->sourceRGB[2];
 
         $max = max($red, $green, $blue);
         $min = min($red, $green, $blue);
@@ -124,7 +99,7 @@ class ColorSwitch
                 $hue = 0;
         }
 
-        $hue = ($hue * 60 + 360) % 360;  // ensures it is positive
+        $hue = fmod(($hue * 60 + 360) , 360);  // ensures it is positive
         $saturation = ($max == 0) ? 0 : ($chroma / $max * 100);
         $variance = $max * 100;
         $this->result = array($hue, $saturation, $variance);
@@ -132,9 +107,9 @@ class ColorSwitch
 
     public function outputHSL()
     {
-        $red = $this->red;
-        $green = $this->green;
-        $blue = $this->blue;
+        $red = $this->sourceRGB[0];
+        $green = $this->sourceRGB[1];
+        $blue = $this->sourceRGB[2];
 
         $max = max($red, $green, $blue);
         $min = min($red, $green, $blue);
@@ -157,7 +132,7 @@ class ColorSwitch
                 $hue = 0;
         }
 
-        $hue = ($hue * 60 + 360) % 360;  // ensures it is positive
+        $hue = fmod(($hue * 60 + 360) , 360);  // ensures it is positive
         $lightness = ($max + $min) * 50;
         $saturation = ($chroma === 0) ? 0 : ($chroma / (1 - abs($lightness * 0.02 - 1)) * 100);
         $this->result = array($hue, $saturation, $lightness);
@@ -165,9 +140,9 @@ class ColorSwitch
 
     public function outputCMYK()
     {
-        $red = $this->red;
-        $green = $this->green;
-        $blue = $this->blue;
+        $red = $this->sourceRGB[0];
+        $green = $this->sourceRGB[1];
+        $blue = $this->sourceRGB[2];
 
         $max = max($red, $green, $blue);
         $K = 1 - $max;
@@ -183,7 +158,7 @@ class ColorSwitch
 
     public function outputRGB()
     {
-        $this->result = array($this->red * 255, $this->green * 255, $this->blue * 255);
+        $this->result = array_map( function($val) { return $val * 255; }, $this->sourceRGB);
     }
 
 }
